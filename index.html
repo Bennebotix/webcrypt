@@ -13,7 +13,7 @@
         if ("serviceWorker" in navigator) {
           try {
             const registration = await navigator.serviceWorker.register(
-              "decrypter.js"
+              "backend.js"
             );
             console.log(
               "Service Worker registered with scope:",
