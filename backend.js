@@ -11,6 +11,21 @@ self.addEventListener("install", async (event) => {
   }
 });
 
+async function handle(req, cache) {
+  if (req.method == "GET" && req.mode == "same-origin") {
+    let res =  await decrypt(req);
+    if (res) {
+      await cache.put(event.request, fetchResponse.clone());
+    }
+    return res;
+  } else {
+    return await fetch(req);
+}
+
+await function decrypt(req) {
+  Webcrypt.decrypt()
+}
+
 // Fetching resources
 self.addEventListener("fetch", (event) => {
   event.respondWith(
@@ -24,10 +39,9 @@ self.addEventListener("fetch", (event) => {
           return cachedResponse;
         }
 
-        const fetchResponse = await fetch(event.request);
+        const fetchResponse = await handle(event.request, cache);
         if (fetchResponse) {
           console.log("fetchResponse: ", event.request.url);
-          await cache.put(event.request, fetchResponse.clone());
           return fetchResponse;
         }
       } catch (error) {
