@@ -147,14 +147,22 @@
           const resolve = path => path.replace(/^\/+|\/+$/g, '');
         
           const promises = {
-            async readFile(path) {
+            async readFile(path, options = {}) {
               const p = resolve(path);
               if (!(p in files)) throw Object.assign(new Error(`ENOENT: ${path}`), { code: 'ENOENT' });
-              return files[p];
+            
+              const data = files[p];
+              if (options.encoding === 'utf8' || options === 'utf8') {
+                return new TextDecoder().decode(data);
+              }
+              return data;
             },
-            async writeFile(path, data) {
-              files[resolve(path)] = data instanceof Uint8Array ? data : new TextEncoder().encode(data);
+            
+            async writeFile(path, data, options = {}) {
+              files[resolve(path)] =
+                typeof data === 'string' ? new TextEncoder().encode(data) : data;
             },
+
             async mkdir(path) {
               // no-op for flat fs
             },
