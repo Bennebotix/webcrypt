@@ -40,6 +40,7 @@ async function handle(req, cache) {
     return res;
   } else {
     return await fetch(req);
+  }
 }
 
 async function decrypt(req) {
