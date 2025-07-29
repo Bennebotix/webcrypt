@@ -1,43 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <code>Decrypter Backend</code>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Webcrypt - Access Denied</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .modal {
+      background-color: #300;
+      border: 2px solid #f00;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 320px;
+      box-shadow: 0 0 20px #f00;
+      text-align: center;
+    }
+
+    .modal h1 {
+      margin: 0 0 10px;
+      color: #f55;
+    }
+
+    .modal p {
+      color: #faa;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      user-select: none;
+    }
+
+    form {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 40px 10px 10px; /* right padding for eye & submit */
+      background-color: #111;
+      border: 1px solid #f00;
+      border-radius: 4px;
+      color: white;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    input::placeholder {
+      color: #888;
+    }
+
+    /* Eye toggle button inside input */
+    .eye-toggle {
+      position: absolute;
+      right: 90px;
+      background: none;
+      border: none;
+      color: #f00;
+      cursor: pointer;
+      font-size: 1.3rem;
+      user-select: none;
+      padding: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .eye-toggle:focus {
+      outline: none;
+    }
+
+    /* Submit button inside input on right */
+    button[type="submit"] {
+      position: absolute;
+      right: 0;
+      height: 100%;
+      background-color: #f00;
+      color: white;
+      border: none;
+      padding: 0 15px;
+      border-radius: 0 4px 4px 0;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1rem;
+      user-select: none;
+      transition: background-color 0.2s;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #c00;
+    }
+  </style>
+</head>
+<body>
+  <div class="modal" role="dialog" aria-labelledby="modal-title" aria-describedby="modal-desc">
+    <h1 id="modal-title">Webcrypt</h1>
+    <p id="modal-desc">This site is encrypted, enter the password to access.</p>
+    <form id="login-form" autocomplete="off" onsubmit="return false;">
+      <input
+        id="password"
+        type="password"
+        placeholder="Enter password..."
+        aria-label="Password"
+        required
+        autocomplete="new-password"
+      />
+      <button type="button" class="eye-toggle" aria-label="Toggle password visibility" title="Show password">
+        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2L22 22" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.71277 6.7226C3.66479 8.79527 2 12 2 12C2 12 5.63636 19 12 19C14.0503 19 15.8174 18.2734 17.2711 17.2884M11 5.05822C11.3254 5.02013 11.6588 5 12 5C18.3636 5 22 12 22 12C22 12 21.3082 13.3317 20 14.8335" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 14.2362C13.4692 14.7112 12.7684 15.0001 12 15.0001C10.3431 15.0001 9 13.657 9 12.0001C9 11.1764 9.33193 10.4303 9.86932 9.88818" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="submit" id="submit-btn">Submit</button>
+    </form>
+  </div>
+
+  <script>
+    navigator.serviceWorker.addEventListener('message', e => {
+      console.log('Message from Service Worker:', e.data);
+    });
     
-    <script>
-      navigator.serviceWorker.addEventListener('message', e => {
-        console.log('Message from Service Worker:', e.data);
-      });
-      
-      function registerServiceWorker() {
-        if ("serviceWorker" in navigator) {
-          try {
-            navigator.serviceWorker.register(
-              "backend.js"
-            ).then(reg => {
-              if (navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage({ });
-              } else {
-                navigator.serviceWorker.ready.then(sw => {
-                  sw.active.postMessage({ });
-                });
-              }
-              console.log(
-                "Service Worker registered with scope:",
-                reg.scope
-              );
-            });
-          } catch (error) {
-            console.error("Service Worker registration failed:", error);
-          }
+    function registerServiceWorker() {
+      if ("serviceWorker" in navigator) {
+        try {
+          navigator.serviceWorker.register(
+            "backend.js"
+          ).then(reg => {
+            if (navigator.serviceWorker.controller) {
+              navigator.serviceWorker.controller.postMessage({ });
+            } else {
+              navigator.serviceWorker.ready.then(sw => {
+                sw.active.postMessage({ });
+              });
+            }
+            console.log(
+              "Service Worker registered with scope:",
+              reg.scope
+            );
+          });
+        } catch (error) {
+          console.error("Service Worker registration failed:", error);
         }
       }
+    }
 
-      registerServiceWorker();
-    </script>
-  </body>
+    registerServiceWorker();
+    
+    const passwordInput = document.getElementById('password');
+    const eyeToggle = document.querySelector('.eye-toggle');
+    const form = document.getElementById('login-form');
+
+    eyeToggle.addEventListener('click', () => {
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeToggle.innerHTML = '<svg fill="#fff" width="20px" height="20px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21.92,11.6C19.9,6.91,16.1,4,12,4S4.1,6.91,2.08,11.6a1,1,0,0,0,0,.8C4.1,17.09,7.9,20,12,20s7.9-2.91,9.92-7.6A1,1,0,0,0,21.92,11.6ZM12,18c-3.17,0-6.17-2.29-7.9-6C5.83,8.29,8.83,6,12,6s6.17,2.29,7.9,6C18.17,15.71,15.17,18,12,18ZM12,8a4,4,0,1,0,4,4A4,4,0,0,0,12,8Zm0,6a2,2,0,1,1,2-2A2,2,0,0,1,12,14Z"/></svg>';
+        eyeToggle.title = 'Hide password';
+      } else {
+        passwordInput.type = 'password';
+        eyeToggle.innerHTML = '<svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2L22 22" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.71277 6.7226C3.66479 8.79527 2 12 2 12C2 12 5.63636 19 12 19C14.0503 19 15.8174 18.2734 17.2711 17.2884M11 5.05822C11.3254 5.02013 11.6588 5 12 5C18.3636 5 22 12 22 12C22 12 21.3082 13.3317 20 14.8335" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 14.2362C13.4692 14.7112 12.7684 15.0001 12 15.0001C10.3431 15.0001 9 13.657 9 12.0001C9 11.1764 9.33193 10.4303 9.86932 9.88818" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        eyeToggle.title = 'Show password';
+      }
+      passwordInput.focus();
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Access Denied');
+      passwordInput.value = '';
+      passwordInput.focus();
+    });
+
+    passwordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        form.requestSubmit();
+      }
+    });
+  </script>
+</body>
 </html>
