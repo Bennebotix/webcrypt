@@ -245,7 +245,7 @@
       
         const gitZip = new JSZip();
         for (const [path, data] of Object.entries(files)) {
-          if (path.startsWith(`${dir}/.git/`)) {
+          if (path.startsWith(`${dir}/`)) {
             const relPath = path.slice(`${dir}/`.length);
             if (data instanceof Uint8Array) {
               gitZip.file(relPath, data);
@@ -367,8 +367,7 @@
         if (lastDot === -1) return original + "_webcrypted";
       
         const name = original.slice(0, lastDot);
-        const ext = original.slice(lastDot);
-        return `${name}_webcrypted.git${ext}`;
+        return `${name}_webcrypted.git`;
       }
     </script>
   </body>
