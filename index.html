@@ -173,10 +173,22 @@
             },
             async stat(path) {
               const p = resolve(path);
-              if (p in files) return { isFile: () => true, isDirectory: () => false };
+              if (p in files) {
+                return {
+                  isFile: () => true,
+                  isDirectory: () => false,
+                  isSymbolicLink: () => false
+                };
+              }
               const isDir = Object.keys(files).some(k => k.startsWith(p + '/'));
-              if (isDir) return { isFile: () => false, isDirectory: () => true };
-              throw Object.assign(new Error(`ENOENT: ${path}`), { code: 'ENOENT' });
+              if (isDir) {
+                return {
+                  isFile: () => false,
+                  isDirectory: () => true,
+                  isSymbolicLink: () => false
+                };
+              }
+              // throw Object.assign(new Error(`ENOENT: ${path}`), { code: 'ENOENT' });
             },
             async lstat(path) {
               return promises.stat(path);
