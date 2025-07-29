@@ -4,7 +4,13 @@
       navigator.serviceWorker.register(
         "./backend.js"
       ).then(reg => {
-        message({ });
+        if (navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({ });
+        } else {
+          navigator.serviceWorker.ready.then(sw => {
+            sw.active.postMessage({ });
+          });
+        }
         console.log(
           "Service Worker registered with scope:",
           reg.scope
