@@ -3,6 +3,9 @@ const assets = ["index.html"];
 
 // Installing the Service Worker
 self.addEventListener("install", async (event) => {
+  self.pass = "";
+  self.key = Webcrypt.genRandKey();
+  
   try {
     const cache = await caches.open(cacheName);
     await cache.addAll(assets);
@@ -23,7 +26,14 @@ async function handle(req, cache) {
 }
 
 await function decrypt(req) {
-  Webcrypt.decrypt()
+  const oldRes = await fetch(req);
+  const buffer = await oldRes.arrayBuffer();
+  const enc = new Uint8Array(buffer);
+  const dec = await Webcrypt.decrypt(enc, self.key);
+  
+  // Optional: Convert decrypted bytes to string if it's UTF-8 encoded text
+  const decoder = new TextDecoder();
+  const text = decoder.decode(decrypted);
 }
 
 // Fetching resources
