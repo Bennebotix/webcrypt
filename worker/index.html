@@ -1,0 +1,4 @@
+<script>
+  const p = location.pathname, i = p.lastIndexOf("index");
+  if(i > -1) location.pathname = p.slice(0,i) + "portal" + p.slice(i+5);
+</script>
