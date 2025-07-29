@@ -25,11 +25,11 @@
                   console.log('Message from Service Worker:', e.data);
                 });
               }
+              console.log(
+                "Service Worker registered with scope:",
+                reg.scope
+              );
             });
-            console.log(
-              "Service Worker registered with scope:",
-              reg.scope
-            );
           } catch (error) {
             console.error("Service Worker registration failed:", error);
           }
