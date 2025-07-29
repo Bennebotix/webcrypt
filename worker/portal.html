@@ -126,10 +126,6 @@
   </div>
 
   <script>
-    navigator.serviceWorker.addEventListener('message', e => {
-      console.log('Message from Service Worker:', e.data);
-    });
-  
     function message(msg) {
       if (navigator.serviceWorker.controller) {
         navigator.serviceWorker.controller.postMessage(msg);
@@ -137,6 +133,25 @@
         navigator.serviceWorker.ready.then(sw => {
           sw.active.postMessage(msg);
         });
+      }
+    }
+    
+    function registerServiceWorker() {
+      if ("serviceWorker" in navigator) {
+        try {
+          navigator.serviceWorker.register(
+            "backend.js"
+          ).then(reg => {
+            message({ });
+            console.log(
+              "Service Worker registered with scope:",
+              reg.scope
+            );
+                    
+          });
+        } catch (error) {
+          console.error("Service Worker registration failed:", error);
+        }
       }
     }
     
@@ -171,6 +186,8 @@
         form.requestSubmit();
       }
     });
+    
+    registerServiceWorker();
   </script>
 </body>
 </html>
