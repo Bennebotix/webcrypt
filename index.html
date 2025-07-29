@@ -147,16 +147,16 @@
           const resolve = path => path.replace(/^\/+|\/+$/g, '');
         
           const promises = {
-            async readFile(path, opts) {
+            async readFile(path) {
               const p = resolve(path);
-              if (!(p in files)) throw Object.assign(new Error(`ENOENT: no such file, open '${path}'`), { code: 'ENOENT' });
+              if (!(p in files)) throw Object.assign(new Error(`ENOENT: ${path}`), { code: 'ENOENT' });
               return files[p];
             },
-            async writeFile(path, data, opts) {
+            async writeFile(path, data) {
               files[resolve(path)] = data instanceof Uint8Array ? data : new TextEncoder().encode(data);
             },
-            async mkdir(path, opts) {
-              // Optional: validate or simulate folders
+            async mkdir(path) {
+              // no-op for flat fs
             },
             async readdir(path) {
               const prefix = resolve(path) + '/';
@@ -174,23 +174,40 @@
               if (p in files) return { isFile: () => true, isDirectory: () => false };
               const isDir = Object.keys(files).some(k => k.startsWith(p + '/'));
               if (isDir) return { isFile: () => false, isDirectory: () => true };
-              throw Object.assign(new Error(`ENOENT: no such file or directory, stat '${path}'`), { code: 'ENOENT' });
+              throw Object.assign(new Error(`ENOENT: ${path}`), { code: 'ENOENT' });
+            },
+            async lstat(path) {
+              return promises.stat(path);
+            },
+            async unlink(path) {
+              const p = resolve(path);
+              if (p in files) delete files[p];
+              else throw Object.assign(new Error(`ENOENT: ${path}`), { code: 'ENOENT' });
+            },
+            async rmdir(path) {
+              const p = resolve(path);
+              const hasChildren = Object.keys(files).some(k => k.startsWith(p + '/'));
+              if (hasChildren) throw Object.assign(new Error(`ENOTEMPTY: ${path}`), { code: 'ENOTEMPTY' });
+              // no real dirs so no-op
+            },
+            async readlink(path) {
+              throw Object.assign(new Error(`EINVAL: not a symlink`), { code: 'EINVAL' });
             }
           };
         
-          // Create top-level API that binds correctly
-          const fs = {
+          return {
             promises,
-            readFile: (...args) => promises.readFile(...args),
-            writeFile: (...args) => promises.writeFile(...args),
-            mkdir: (...args) => promises.mkdir(...args),
-            readdir: (...args) => promises.readdir(...args),
-            stat: (...args) => promises.stat(...args)
+            readFile: promises.readFile.bind(promises),
+            writeFile: promises.writeFile.bind(promises),
+            mkdir: promises.mkdir.bind(promises),
+            readdir: promises.readdir.bind(promises),
+            stat: promises.stat.bind(promises),
+            lstat: promises.lstat.bind(promises),
+            unlink: promises.unlink.bind(promises),
+            rmdir: promises.rmdir.bind(promises),
+            readlink: promises.readlink.bind(promises),
           };
-        
-          return fs;
         })();
-
       
         const dir = 'repo';
       
