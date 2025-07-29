@@ -22,9 +22,9 @@ self.addEventListener("install", async (event) => {
       for (const client of clients) {
         client.postMessage({ new: self.new });
       }
+      
+      self.new = false;
     });
-    
-    self.new = false;
   } catch (error) {
     console.error("Service Worker installation failed:", error);
   }
