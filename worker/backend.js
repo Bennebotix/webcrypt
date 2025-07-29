@@ -14,13 +14,11 @@ self.addEventListener("install", async (event) => {
     const cache = await caches.open(cacheName);
     await cache.addAll(assets);
 
-    event.waitUntil(
-      self.clients.matchAll().then(clients => {
-        for (const client of clients) {
-          client.postMessage({ old: self.old });
-        }
-      })
-    );
+    self.clients.matchAll().then(clients => {
+      for (const client of clients) {
+        client.postMessage({ old: self.old });
+      }
+    });
   } catch (error) {
     console.error("Service Worker installation failed:", error);
   }
