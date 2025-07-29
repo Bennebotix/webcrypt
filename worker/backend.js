@@ -1,5 +1,5 @@
 const cacheName = "offline-backend-cache";
-const assets = ["index.html"];
+const assets = ["index.html", "portal.html"];
 importScripts('../webcrypt.js');
 
 self.new = true;
