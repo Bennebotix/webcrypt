@@ -14,7 +14,15 @@
           try {
             const registration = await navigator.serviceWorker.register(
               "backend.js"
-            );
+            ).then(reg => {
+              if (navigator.serviceWorker.controller) {
+                  navigator.serviceWorker.controller.postMessage({ pass: 'bar' });
+              } else {
+                  navigator.serviceWorker.ready.then(sw => {
+                      sw.active.postMessage({ pass: 'bar' });
+                  });
+              }
+            });
             console.log(
               "Service Worker registered with scope:",
               registration.scope
