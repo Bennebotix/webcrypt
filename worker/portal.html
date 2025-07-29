@@ -21,7 +21,7 @@
       border: 2px solid #f00;
       padding: 2rem;
       border-radius: 8px;
-      width: 1020px;
+      width: 320px;
       box-shadow: 0 0 20px #f00;
       text-align: center;
       margin: 20px;
@@ -179,6 +179,8 @@
       e.preventDefault();
 
       message({ pass: passwordInput.value });
+
+      window.location.reload();
     });
 
     passwordInput.addEventListener('keydown', (e) => {
