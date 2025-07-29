@@ -217,7 +217,7 @@
             "'>Here</a>"
         );
         
-        document.querySelector("#copy-btn").addEventListener("click", _ => {
+        document.querySelector("#copy-btn").addEventListener("click", e => {
           const text = document.querySelector("#b64")?.textContent.trim();
           if (text) {
             navigator.clipboard.writeText(text).then(() => {
