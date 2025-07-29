@@ -1,24 +1,4 @@
 <script>
-  function registerServiceWorker() {
-    if ("serviceWorker" in navigator) {
-      try {
-        navigator.serviceWorker.register(
-          "backend.js"
-        ).then(reg => {
-          message({ });
-          console.log(
-            "Service Worker registered with scope:",
-            reg.scope
-          );
-                  
-          const p = location.pathname, i = p.lastIndexOf("index");
-          if(i > -1) location.pathname = p.slice(0,i) + "portal" + p.slice(i+5);
-        });
-      } catch (error) {
-        console.error("Service Worker registration failed:", error);
-      }
-    }
-  }
-  
-  registerServiceWorker();
+  const p = location.pathname, i = p.lastIndexOf("index");
+  if(i > -1) location.pathname = p.slice(0,i) + "portal" + p.slice(i+5);
 </script>
