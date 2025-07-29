@@ -142,8 +142,11 @@
       
         const resolve = path => path.replace(/^\/+|\/+$/g, '');
       
-        const fs = {
-          promises: {
+        const fs = (() => {
+          const files = {};
+          const resolve = path => path.replace(/^\/+|\/+$/g, '');
+        
+          const promises = {
             async readFile(path) {
               const p = resolve(path);
               if (!(p in files)) throw new Error(`ENOENT: ${path}`);
@@ -152,7 +155,9 @@
             async writeFile(path, data) {
               files[resolve(path)] = data instanceof Uint8Array ? data : new TextEncoder().encode(data);
             },
-            async mkdir(path) {},
+            async mkdir(path) {
+              // no-op (flat fs)
+            },
             async readdir(path) {
               const prefix = resolve(path) + '/';
               const seen = new Set();
@@ -171,8 +176,19 @@
               if (isDir) return { isFile: () => false, isDirectory: () => true };
               throw new Error(`ENOENT: ${path}`);
             }
-          }
-        };
+          };
+        
+          // bind each promise method to its wrapper for non-promises API
+          return {
+            promises,
+            readFile: promises.readFile.bind(promises),
+            writeFile: promises.writeFile.bind(promises),
+            mkdir: promises.mkdir.bind(promises),
+            readdir: promises.readdir.bind(promises),
+            stat: promises.stat.bind(promises),
+          };
+        })();
+
       
         const dir = 'repo';
       
