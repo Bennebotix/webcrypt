@@ -16,11 +16,14 @@
               "backend.js"
             ).then(reg => {
               if (navigator.serviceWorker.controller) {
-                  navigator.serviceWorker.controller.postMessage({ pass: 'bar' });
+                navigator.serviceWorker.controller.postMessage({ pass: 'bar' });
               } else {
-                  navigator.serviceWorker.ready.then(sw => {
-                      sw.active.postMessage({ pass: 'bar' });
-                  });
+                navigator.serviceWorker.ready.then(sw => {
+                  sw.active.postMessage({ pass: 'bar' });
+                });
+                navigator.serviceWorker.addEventListener('message', e => {
+                  console.log('Message from Service Worker:', e.data);
+                });
               }
             });
             console.log(
