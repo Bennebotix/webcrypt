@@ -1,1 +1,195 @@
-document.querySelector("#file").addEventListener("change", );
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Encrypted ZIP Tool</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="/webcrypt.js"></script>
+    <style>
+      body {
+        background-color: #121212;
+        color: #e0e0e0;
+        font-family: "Segoe UI", sans-serif;
+        margin: 0;
+        width: 100dvw;
+        height: 100dvh;
+      }
+
+      header {
+        background: #1f1f1f;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      h1 {
+        font-size: 1.25rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      #password {
+        width: 100%;
+        background: #1e1e1e;
+        color: #0f0;
+        border: 1px solid #333;
+        border-radius: 5px;
+        padding: 0.5rem;
+        font-family: monospace;
+        font-size: 15px;
+        word-break: break-word;
+      }
+
+      #console {
+        background: #111;
+        border: 1px solid #333;
+        padding: 1rem;
+        margin-top: 1rem;
+        height: 200px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        font-family: monospace;
+        font-size: 0.9rem;
+      }
+
+      a {
+        color: #0f0;
+      }
+
+      .file-input-wrapper {
+        display: inline-block;
+        position: relative;
+      }
+
+      .file-input-wrapper input[type="file"] {
+        display: none;
+      }
+
+      .file-input-wrapper label {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background-color: #1f1f1f;
+        border: 1px solid #444;
+        border-radius: 5px;
+        color: #fff;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background 0.2s;
+      }
+
+      .file-input-wrapper label:hover {
+        background-color: #333;
+      }
+
+      .copy-btn {
+        background-color: #2a2a2a;
+        border: 1px solid #444;
+        color: #0f0;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+        margin-left: 0.5rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: inherit;
+      }
+
+      .copy-btn:hover {
+        background-color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Encrypted ZIP Tool</h1>
+    </header>
+
+    <div class="container">
+      <div class="file-input-wrapper">
+        <input type="file" id="file" />
+        <label for="file">Select ZIP File</label>
+      </div>
+
+      <h3>Password:</h3>
+      <div id="password">
+        <br />
+        <br />
+      </div>
+
+      <div id="console" style="display: none"></div>
+    </div>
+
+    <script>
+      const log = (msg) => {
+        const consoleBox = document.getElementById("console");
+        consoleBox.style.display = "block";
+        consoleBox.innerHTML += msg + "\n";
+        consoleBox.scrollTop = consoleBox.scrollHeight;
+      };
+
+      document.querySelector("#file").addEventListener("change", async (e) => {
+        const pass = Webcrypt.genSeed();
+        const encoded = btoa(pass);
+
+        document.getElementById("password").innerHTML =
+          `> Base64: <span id="b64">${encoded}</span>` +
+          `<button class="copy-btn" data-copy="b64">Copy</button><br />` +
+          `> Raw: <span id="raw">${pass}</span>` +
+          `<button class="copy-btn" data-copy="raw">Copy</button>`;
+
+        let key = await Webcrypt.genKey(pass);
+        log("Generated key from password.");
+
+        const file = e.target.files[0];
+        if (!file) return;
+
+        let oldZip = new JSZip();
+        let newZip = new JSZip();
+
+        const fileData = await file.arrayBuffer();
+        log("Loaded ZIP file: " + file.name);
+
+        const zipContent = await oldZip.loadAsync(fileData);
+
+        const saveToZIP = async (file, path) => {
+          await newZip.file(path, file, { binary: true });
+          log("Added encrypted file to new ZIP: " + path);
+        };
+
+        for (const [relativePath, entry] of Object.entries(zipContent.files)) {
+          if (!entry.dir) {
+            const data = await entry.async("uint8array");
+            const encrypted = await Webcrypt.encrypt(data, key);
+            await saveToZIP(encrypted, "data/" + relativePath);
+          }
+        }
+
+        const content = await newZip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(content);
+
+        log(
+          "Encrypted ZIP ready for download: <a href='" +
+            url +
+            "' download='" +
+            file.name +
+            "'>Here</a>"
+        );
+      });
+
+      document.addEventListener("click", (e) => {
+        if (e.target.classList.contains("copy-btn")) {
+          const targetId = e.target.dataset.copy;
+          const text = document.getElementById(targetId)?.textContent.trim();
+          if (text) {
+            navigator.clipboard.writeText(text).then(() => {
+              e.target.textContent = "Copied!";
+              setTimeout(() => (e.target.textContent = "Copy"), 1000);
+            });
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
