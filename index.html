@@ -32,7 +32,7 @@
       }
 
       #password {
-        width: calc(100dvw - 2rem);
+        width: calc(100dvw - 3rem);
         background: #1e1e1e;
         color: #0f0;
         border: 1px solid #333;
@@ -207,10 +207,19 @@
           "Encrypted ZIP ready for download: <a href='" +
             url +
             "' download='" +
-            file.name +
+            webcryptFilename(file.name) +
             "'>Here</a>"
         );
       });
+
+      function webcryptFilename(original) {
+        const lastDot = original.lastIndexOf(".");
+        if (lastDot === -1) return original + "_webcrypted"; // No extension
+      
+        const name = original.slice(0, lastDot);
+        const ext = original.slice(lastDot);
+        return `${name}_webcrypted.${ext.slice(1)}${ext}`;
+      }
 
       document.addEventListener("click", (e) => {
         if (e.target.classList.contains("copy-btn")) {
