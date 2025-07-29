@@ -1,9 +1,13 @@
 <script>
-  navigator.serviceWorker.addEventListener('message', e => {
-    if (e.data.new) {
-      // Go to portal
+  navigator.serviceWorker.addEventListener("message", e => {
+    const p = window.location.pathname;
+    const loc = e.data.new ? "portal.html" : "data";
+    if (p.endsWith("/")) {
+      window.location.pathname = p + loc;
+    } else if (p.includes(".", p.lastIndexOf("/"))) {
+      window.location.pathname = p.slice(0, p.lastIndexOf("/") + 1) + loc;
     } else {
-      // Go to data
+      window.location.pathname = p + "/" + loc;
     }
   });
 </script>
