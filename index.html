@@ -43,6 +43,10 @@
         word-break: break-word;
       }
 
+      #pass {
+        display: none;
+      }
+
       #console {
         background: #111;
         border: 1px solid #333;
@@ -112,10 +116,12 @@
         <label for="file">Select ZIP File</label>
       </div>
 
-      <h3>Password:</h3>
-      <div id="password">
-        <br />
-        <br />
+      <div id="pass">
+        <h3>Password:</h3>
+        <div id="password">
+          <br />
+          <br />
+        </div>
       </div>
 
       <div id="console" style="display: none"></div>
@@ -123,7 +129,7 @@
 
     <script>
       const log = (msg) => {
-        const consoleBox = document.getElementById("console");
+        const consoleBox = document.querySelector("#console");
         consoleBox.style.display = "block";
         consoleBox.innerHTML += msg + "\n";
         consoleBox.scrollTop = consoleBox.scrollHeight;
@@ -133,11 +139,13 @@
         const pass = Webcrypt.genSeed();
         const encoded = btoa(pass);
 
-        document.getElementById("password").innerHTML =
+        consoleBox.innerHTML = "";
+        document.querySelector("#password").innerHTML =
           `> Base64: <span id="b64">${encoded}</span>` +
           `<button class="copy-btn" data-copy="b64">Copy</button><br />` +
           `> Raw: <span id="raw">${pass}</span>` +
           `<button class="copy-btn" data-copy="raw">Copy</button>`;
+        document.querySelector("#pass").style.display = "inherit";
 
         let key = await Webcrypt.genKey(pass);
         log("Generated key from password.");
@@ -214,7 +222,7 @@
 
       function webcryptFilename(original) {
         const lastDot = original.lastIndexOf(".");
-        if (lastDot === -1) return original + "_webcrypted"; // No extension
+        if (lastDot === -1) return original + "_webcrypted";
       
         const name = original.slice(0, lastDot);
         const ext = original.slice(lastDot);
@@ -224,7 +232,7 @@
       document.addEventListener("click", (e) => {
         if (e.target.classList.contains("copy-btn")) {
           const targetId = e.target.dataset.copy;
-          const text = document.getElementById(targetId)?.textContent.trim();
+          const text = document.querySelector("#" + targetId)?.textContent.trim();
           if (text) {
             navigator.clipboard.writeText(text).then(() => {
               e.target.textContent = "Copied!";
