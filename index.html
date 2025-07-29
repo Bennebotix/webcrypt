@@ -185,7 +185,7 @@
         }
       
         // 2. Init Git repo
-        await git.init({ fs: fs.promises, dir });
+        await git.init({ fs: fs, dir });
       
         // 3. Stage and commit
         const allFiles = await git.listFiles({ fs: fs.promises, dir });
