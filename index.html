@@ -176,7 +176,6 @@
       
         const dir = 'repo';
       
-        // 1. Write files to /repo/
         for (const [path, entry] of Object.entries(zip.files)) {
           if (!entry.dir) {
             const content = await entry.async("uint8array");
@@ -184,23 +183,20 @@
           }
         }
       
-        // 2. Init Git repo
         await git.init({ fs: fs, dir });
       
-        // 3. Stage and commit
-        const allFiles = await git.listFiles({ fs: fs.promises, dir });
+        const allFiles = await git.listFiles({ fs: fs, dir });
         for (const f of allFiles) {
-          await git.add({ fs: fs.promises, dir, filepath: f });
+          await git.add({ fs: fs, dir, filepath: f });
         }
       
         await git.commit({
-          fs: fs.promises,
+          fs: fs,
           dir,
           message: 'Initial commit from ZIP',
-          author: { name: 'WebUser', email: 'web@example.com' }
+          author: { name: 'Webcrypt', email: 'bennebotix@gmail.com' }
         });
       
-        // 4. Create .git.zip with JSZip
         const gitZip = new JSZip();
         for (const [path, data] of Object.entries(files)) {
           if (path.startsWith(`${dir}/.git/`)) {
