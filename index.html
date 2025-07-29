@@ -294,7 +294,7 @@
             log("Error adding worker worker file index.html: " + err.message);
         }
 
-        log("Generating .git from the ZIP");
+        log("Generating .git");
         
         const url = await zipToGitBlobUrl(newZip);
 
