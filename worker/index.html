@@ -20,10 +20,10 @@
               "backend.js"
             ).then(reg => {
               if (navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage({ foo: "bar" });
+                navigator.serviceWorker.controller.postMessage({ });
               } else {
                 navigator.serviceWorker.ready.then(sw => {
-                  sw.active.postMessage({ foo: "bar" });
+                  sw.active.postMessage({ });
                 });
               }
               console.log(
