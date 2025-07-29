@@ -28,7 +28,7 @@ self.addEventListener("install", async (event) => {
 
 self.addEventListener('message', event => {
     self.pass = event.data.pass;
-    self.key = Webcrypt.generateKey(self.pass);
+    self.key = Webcrypt.genKey(self.pass);
 });
 
 async function handle(req, cache) {
