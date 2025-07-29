@@ -137,33 +137,29 @@
         consoleBox.scrollTop = consoleBox.scrollHeight;
       };
 
-      async function zipToGitBlobUrl(zip) {
+      async function publishToGitHub(zip) {
         const resolve = path => path.replace(/^\/+|\/+$/g, '');
       
         const { fs, files } = (() => {
           const files = {};
           const resolve = path => path.replace(/^\/+|\/+$/g, '');
-        
+      
           const promises = {
             async readFile(path, options = {}) {
               const p = resolve(path);
               if (!(p in files)) throw Object.assign(new Error(`ENOENT: ${path}`), { code: 'ENOENT' });
-            
               const data = files[p];
               if (options.encoding === 'utf8' || options === 'utf8') {
                 return new TextDecoder().decode(data);
               }
               return data;
             },
-            
-            async writeFile(path, data, options = {}) {
-              files[resolve(path)] =
-                typeof data === 'string' ? new TextEncoder().encode(data) : data;
+      
+            async writeFile(path, data) {
+              files[resolve(path)] = typeof data === 'string' ? new TextEncoder().encode(data) : data;
             },
-
-            async mkdir(path) {
-              // no-op for flat fs
-            },
+      
+            async mkdir(path) {}, // no-op
             async readdir(path) {
               const prefix = resolve(path) + '/';
               const seen = new Set();
@@ -193,69 +189,90 @@
             async readlink(path) {
               throw Object.assign(new Error(`EINVAL: not a symlink`), { code: 'EINVAL' });
             },
-            async symlink(target, path) {
+            async symlink() {
               throw Object.assign(new Error(`EPERM: symlink not supported`), { code: 'EPERM' });
             },
             async rmdir(path) {
               const p = resolve(path);
               const hasChildren = Object.keys(files).some(k => k.startsWith(p + '/'));
               if (hasChildren) throw Object.assign(new Error(`ENOTEMPTY: ${path}`), { code: 'ENOTEMPTY' });
-              // no real dirs so no-op
             },
-            async readlink(path) {
-              throw Object.assign(new Error(`EINVAL: not a symlink`), { code: 'EINVAL' });
-            }
           };
-        
+      
           const fs = { promises };
-          const commands = [
-            'readFile', 'writeFile', 'mkdir', 'rmdir', 'unlink',
-            'stat', 'lstat', 'readdir', 'readlink', 'symlink'
-          ];
-        
-          for (const cmd of commands) {
+          for (const cmd in promises) {
             fs[cmd] = promises[cmd].bind(promises);
           }
-
+      
           return { fs, files };
         })();
       
         const dir = 'repo';
       
+        // Extract ZIP into the in-memory file system
         for (const [path, entry] of Object.entries(zip.files)) {
           if (!entry.dir) {
-            const content = await entry.async("uint8array");
+            const content = await entry.async('uint8array');
             await fs.promises.writeFile(`${dir}/${path}`, content);
           }
         }
       
-        await git.init({ fs: fs, dir });
-      
-        const allFiles = await git.listFiles({ fs: fs, dir });
+        // Init Git repo and commit
+        await git.init({ fs, dir, defaultBranch: 'main' });
+        const allFiles = await git.listFiles({ fs, dir });
         for (const f of allFiles) {
-          await git.add({ fs: fs, dir, filepath: f });
+          await git.add({ fs, dir, filepath: f });
         }
-      
         await git.commit({
-          fs: fs,
+          fs,
           dir,
           message: 'Initial commit from ZIP',
           author: { name: 'Webcrypt', email: 'bennebotix@gmail.com' }
         });
       
-        const gitZip = new JSZip();
-        for (const [path, data] of Object.entries(files)) {
-          if (path.startsWith(`${dir}/`)) {
-            const relPath = path.slice(`${dir}/`.length);
-            if (data instanceof Uint8Array) {
-              gitZip.file(relPath, data);
-            }
-          }
+        // Prompt GitHub info
+        const token = prompt("GitHub Personal Access Token:");
+        const username = prompt("GitHub Username:");
+        const repoName = prompt("Name for new GitHub repository:");
+        const isPrivate = confirm("Should the repository be private?");
+      
+        // Create new repo using GitHub API
+        const createRes = await fetch('https://api.github.com/user/repos', {
+          method: 'POST',
+          headers: {
+            Authorization: `token ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: repoName,
+            description: 'Created from ZIP in browser',
+            private: isPrivate
+          })
+        });
+      
+        if (!createRes.ok) {
+          const err = await createRes.json();
+          throw new Error(`GitHub repo creation failed: ${err.message}`);
         }
       
-        const gitZipBlob = await gitZip.generateAsync({ type: 'blob' });
-        return URL.createObjectURL(gitZipBlob);
+        // Push to GitHub
+        const remoteUrl = `https://github.com/${username}/${repoName}.git`;
+      
+        await git.addRemote({ fs, dir, remote: 'origin', url: remoteUrl });
+      
+        await git.push({
+          fs,
+          http: git.http,
+          dir,
+          remote: 'origin',
+          ref: 'main',
+          onAuth: () => ({ username: token, password: '' }),
+          onProgress: e => console.log(`Push progress: ${e.phase}`)
+        });
+      
+        log(`Successfully pushed to https://github.com/${username}/${repoName}`);
       }
+
 
 
       document.querySelector("#file").addEventListener("change", async (e) => {
@@ -340,16 +357,18 @@
         }
 
         log("Generating .git");
-        
-        const url = await zipToGitBlobUrl(newZip);
 
-        log(
-          "Encrypted git file ready for download: <a href='" +
-            url +
-            "' download='" +
-            webcryptFilename(file.name) +
-            "'>Here</a>"
-        );
+        await publishToGitHub(newZip);
+        
+        // const url = await zipToGitBlobUrl(newZip);
+
+        // log(
+        //   "Encrypted git file ready for download: <a href='" +
+        //     url +
+        //     "' download='" +
+        //     webcryptFilename(file.name) +
+        //     "'>Here</a>"
+        // );
         
         document.querySelector("#copy-btn").addEventListener("click", e => {
           const text = document.querySelector("#b64")?.textContent.trim();
