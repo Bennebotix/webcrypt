@@ -138,11 +138,9 @@
       };
 
       async function zipToGitBlobUrl(zip) {
-        const files = {};
-      
         const resolve = path => path.replace(/^\/+|\/+$/g, '');
       
-        const fs = (() => {
+        const { fs, files } = (() => {
           const files = {};
           const resolve = path => path.replace(/^\/+|\/+$/g, '');
         
@@ -219,7 +217,7 @@
             fs[cmd] = promises[cmd].bind(promises);
           }
 
-          return fs;
+          return { fs, files };
         })();
       
         const dir = 'repo';
@@ -367,7 +365,7 @@
       
         const name = original.slice(0, lastDot);
         const ext = original.slice(lastDot);
-        return `${name}_webcrypted${ext}`;
+        return `${name}_webcrypted.git${ext}`;
       }
     </script>
   </body>
