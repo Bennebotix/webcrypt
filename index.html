@@ -128,8 +128,9 @@
     </div>
 
     <script>
-      const log = (msg) => {
-        const consoleBox = document.querySelector("#console");
+      const consoleBox = document.querySelector("#console")
+      
+      const log = (msg) => {;
         consoleBox.style.display = "block";
         consoleBox.innerHTML += msg + "\n";
         consoleBox.scrollTop = consoleBox.scrollHeight;
