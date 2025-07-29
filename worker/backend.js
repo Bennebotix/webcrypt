@@ -42,7 +42,7 @@ async function handle(req, cache) {
     return await fetch(req);
 }
 
-await function decrypt(req) {
+async function decrypt(req) {
   const oldRes = await fetch(req);
   const buffer = await oldRes.arrayBuffer();
   const enc = new Uint8Array(buffer);
