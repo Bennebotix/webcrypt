@@ -136,25 +136,6 @@
       }
     }
     
-    function registerServiceWorker() {
-      if ("serviceWorker" in navigator) {
-        try {
-          navigator.serviceWorker.register(
-            "backend.js"
-          ).then(reg => {
-            message({ });
-            console.log(
-              "Service Worker registered with scope:",
-              reg.scope
-            );
-                    
-          });
-        } catch (error) {
-          console.error("Service Worker registration failed:", error);
-        }
-      }
-    }
-    
     const passwordInput = document.getElementById('password');
     const eyeToggle = document.querySelector('.eye-toggle');
     const form = document.getElementById('login-form');
@@ -186,8 +167,6 @@
         form.requestSubmit();
       }
     });
-    
-    registerServiceWorker();
   </script>
 </body>
 </html>
