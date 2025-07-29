@@ -166,6 +166,40 @@
           }
         }
 
+        
+        try {
+            const workerRes = await fetch("/webcrypt.js");
+            if (!workerRes.ok) throw new Error("Failed to fetch /webcrypt.js");
+
+            const workerBlob = await workerRes.blob();
+            newZip.file("webcrypt.js", workerBlob);
+            log("Added worker webcrypt.js to the ZIP.");
+        } catch (err) {
+            log("Error adding worker file webcrypt.js: " + err.message);
+        }
+
+        try {
+            const workerRes = await fetch("/worker/backend.js");
+            if (!workerRes.ok) throw new Error("Failed to fetch /worker/backend.js");
+
+            const workerBlob = await workerRes.blob();
+            newZip.file("backend.js", workerBlob);
+            log("Added worker backend.js to the ZIP.");
+        } catch (err) {
+            log("Error adding worker worker file backend.js: " + err.message);
+        }
+
+        try {
+            const workerRes = await fetch("/worker/index.html");
+            if (!workerRes.ok) throw new Error("Failed to fetch /worker/index.html");
+
+            const workerBlob = await workerRes.blob();
+            newZip.file("index.html", workerBlob);
+            log("Added worker index.html to the ZIP.");
+        } catch (err) {
+            log("Error adding worker worker file index.html: " + err.message);
+        }
+
         const content = await newZip.generateAsync({ type: "blob" });
         const url = URL.createObjectURL(content);
 
