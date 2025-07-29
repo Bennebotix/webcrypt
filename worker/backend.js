@@ -2,14 +2,25 @@ const cacheName = "offline-backend-cache";
 const assets = ["index.html"];
 importScripts('../webcrypt.js');
 
-// Installing the Service Worker
+self.old = true;
+
 self.addEventListener("install", async (event) => {
-  self.pass = "";
-  self.key = Webcrypt.genRandKey();
-  
   try {
+    self.old = false;
+    
+    self.pass = "";
+    self.key = Webcrypt.genRandKey();
+    
     const cache = await caches.open(cacheName);
     await cache.addAll(assets);
+
+    event.waitUntil(
+      self.clients.matchAll().then(clients => {
+        for (const client of clients) {
+          client.postMessage({ old: self.old });
+        }
+      })
+    );
   } catch (error) {
     console.error("Service Worker installation failed:", error);
   }
