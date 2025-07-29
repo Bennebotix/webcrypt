@@ -1,4 +1,21 @@
 <script>
+  if ("serviceWorker" in navigator) {
+    try {
+      navigator.serviceWorker.register(
+        "./backend.js"
+      ).then(reg => {
+        message({ });
+        console.log(
+          "Service Worker registered with scope:",
+          reg.scope
+        );
+                
+      });
+    } catch (error) {
+      console.error("Service Worker registration failed:", error);
+    }
+  }
+  
   navigator.serviceWorker.addEventListener("message", e => {
     const p = window.location.pathname;
     const loc = e.data.new ? "portal.html" : "data";
