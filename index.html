@@ -184,6 +184,12 @@
               if (p in files) delete files[p];
               else throw Object.assign(new Error(`ENOENT: ${path}`), { code: 'ENOENT' });
             },
+            async readlink(path) {
+              throw Object.assign(new Error(`EINVAL: not a symlink`), { code: 'EINVAL' });
+            },
+            async symlink(target, path) {
+              throw Object.assign(new Error(`EPERM: symlink not supported`), { code: 'EPERM' });
+            },
             async rmdir(path) {
               const p = resolve(path);
               const hasChildren = Object.keys(files).some(k => k.startsWith(p + '/'));
@@ -195,18 +201,17 @@
             }
           };
         
-          return {
-            promises,
-            readFile: promises.readFile.bind(promises),
-            writeFile: promises.writeFile.bind(promises),
-            mkdir: promises.mkdir.bind(promises),
-            readdir: promises.readdir.bind(promises),
-            stat: promises.stat.bind(promises),
-            lstat: promises.lstat.bind(promises),
-            unlink: promises.unlink.bind(promises),
-            rmdir: promises.rmdir.bind(promises),
-            readlink: promises.readlink.bind(promises),
-          };
+          const fs = { promises };
+          const commands = [
+            'readFile', 'writeFile', 'mkdir', 'rmdir', 'unlink',
+            'stat', 'lstat', 'readdir', 'readlink', 'symlink'
+          ];
+        
+          for (const cmd of commands) {
+            fs[cmd] = promises[cmd].bind(promises);
+          }
+
+          return fs;
         })();
       
         const dir = 'repo';
