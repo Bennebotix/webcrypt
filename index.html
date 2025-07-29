@@ -246,7 +246,10 @@
         const gitZip = new JSZip();
         for (const [path, data] of Object.entries(files)) {
           if (path.startsWith(`${dir}/.git/`)) {
-            gitZip.file(path.slice(`${dir}/`.length), data);
+            const relPath = path.slice(`${dir}/`.length);
+            if (data instanceof Uint8Array) {
+              gitZip.file(relPath, data);
+            }
           }
         }
       
