@@ -9,7 +9,11 @@
     <code>Decrypter Backend</code>
     
     <script>
-      async function registerServiceWorker() {
+      navigator.serviceWorker.addEventListener('message', e => {
+        console.log('Message from Service Worker:', e.data);
+      });
+      
+      function registerServiceWorker() {
         if ("serviceWorker" in navigator) {
           try {
             navigator.serviceWorker.register(
@@ -20,9 +24,6 @@
               } else {
                 navigator.serviceWorker.ready.then(sw => {
                   sw.active.postMessage({ pass: 'bar' });
-                });
-                navigator.serviceWorker.addEventListener('message', e => {
-                  console.log('Message from Service Worker:', e.data);
                 });
               }
               console.log(
