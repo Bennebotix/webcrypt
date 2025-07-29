@@ -32,7 +32,7 @@ self.addEventListener('message', event => {
 });
 
 async function handle(req, cache) {
-  if (req.method == "GET" && req.mode == "same-origin") {
+  if (req.method == "GET" && req.mode == "same-origin" && pass !== "") {
     let res =  await decrypt(req);
     if (res) {
       await cache.put(event.request, fetchResponse.clone());
