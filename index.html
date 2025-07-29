@@ -137,12 +137,11 @@
       };
 
       document.querySelector("#file").addEventListener("change", async (e) => {
-        const pass = Webcrypt.genSeed();
-        const encoded = btoa(pass);
+        const pass = btoa(Webcrypt.genSeed());
 
         consoleBox.innerHTML = "";
         document.querySelector("#password").innerHTML =
-          `> <span id="b64">${encoded}</span><button id="copy-btn">Copy</button><br />`;
+          `> <span id="b64">${pass}</span><button id="copy-btn">Copy</button><br />`;
 
         document.querySelector("#copy-btn").addEventListener("click", _ => {
           const text = document.querySelector("#b64")?.textContent.trim();
