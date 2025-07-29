@@ -147,16 +147,16 @@
           const resolve = path => path.replace(/^\/+|\/+$/g, '');
         
           const promises = {
-            async readFile(path) {
+            async readFile(path, opts) {
               const p = resolve(path);
-              if (!(p in files)) throw new Error(`ENOENT: ${path}`);
+              if (!(p in files)) throw Object.assign(new Error(`ENOENT: no such file, open '${path}'`), { code: 'ENOENT' });
               return files[p];
             },
-            async writeFile(path, data) {
+            async writeFile(path, data, opts) {
               files[resolve(path)] = data instanceof Uint8Array ? data : new TextEncoder().encode(data);
             },
-            async mkdir(path) {
-              // no-op (flat fs)
+            async mkdir(path, opts) {
+              // Optional: validate or simulate folders
             },
             async readdir(path) {
               const prefix = resolve(path) + '/';
@@ -174,19 +174,21 @@
               if (p in files) return { isFile: () => true, isDirectory: () => false };
               const isDir = Object.keys(files).some(k => k.startsWith(p + '/'));
               if (isDir) return { isFile: () => false, isDirectory: () => true };
-              throw new Error(`ENOENT: ${path}`);
+              throw Object.assign(new Error(`ENOENT: no such file or directory, stat '${path}'`), { code: 'ENOENT' });
             }
           };
         
-          // bind each promise method to its wrapper for non-promises API
-          return {
+          // Create top-level API that binds correctly
+          const fs = {
             promises,
-            readFile: promises.readFile.bind(promises),
-            writeFile: promises.writeFile.bind(promises),
-            mkdir: promises.mkdir.bind(promises),
-            readdir: promises.readdir.bind(promises),
-            stat: promises.stat.bind(promises),
+            readFile: (...args) => promises.readFile(...args),
+            writeFile: (...args) => promises.writeFile(...args),
+            mkdir: (...args) => promises.mkdir(...args),
+            readdir: (...args) => promises.readdir(...args),
+            stat: (...args) => promises.stat(...args)
           };
+        
+          return fs;
         })();
 
       
