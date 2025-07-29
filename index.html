@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <title>Webcrypt</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="./webcrypt.js"></script>
+    <script src="./worker/webcrypt.js"></script>
     <style>
       body {
         background-color: #121212;
@@ -174,8 +174,8 @@
 
         
         try {
-            const workerRes = await fetch("./webcrypt.js");
-            if (!workerRes.ok) throw new Error("Failed to fetch /webcrypt.js");
+            const workerRes = await fetch("./worker/webcrypt.js");
+            if (!workerRes.ok) throw new Error("Failed to fetch /worker/webcrypt.js");
 
             const workerBlob = await workerRes.blob();
             newZip.file("webcrypt.js", workerBlob);
