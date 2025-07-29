@@ -1,4 +1,38 @@
 <script>
-  const p = location.pathname, i = p.lastIndexOf("index");
-  if(i > -1) location.pathname = p.slice(0,i) + "portal" + p.slice(i+5);
+  navigator.serviceWorker.addEventListener('message', e => {
+    console.log('Message from Service Worker:', e.data);
+  });
+
+  function message(msg) {
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage(msg);
+    } else {
+      navigator.serviceWorker.ready.then(sw => {
+        sw.active.postMessage(msg);
+      });
+    }
+  }
+  
+  function registerServiceWorker() {
+    if ("serviceWorker" in navigator) {
+      try {
+        navigator.serviceWorker.register(
+          "backend.js"
+        ).then(reg => {
+          message({ });
+          console.log(
+            "Service Worker registered with scope:",
+            reg.scope
+          );
+                  
+          const p = location.pathname, i = p.lastIndexOf("index");
+          if(i > -1) location.pathname = p.slice(0,i) + "portal" + p.slice(i+5);
+        });
+      } catch (error) {
+        console.error("Service Worker registration failed:", error);
+      }
+    }
+  }
+  
+  registerServiceWorker();
 </script>
