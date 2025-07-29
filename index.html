@@ -206,22 +206,51 @@
       
           return { fs, files };
         })();
+
+        let dir = "repo";
+              
+        try {
+          await fs.promises.mkdir(dir);
+        } catch {}
       
-        const dir = 'repo';
-      
-        // Extract ZIP into the in-memory file system
+        // Extract all files/folders from JSZip into fs
         for (const [path, entry] of Object.entries(zip.files)) {
-          if (!entry.dir) {
+          if (entry.dir) {
+            // create directories as needed
+            try {
+              await fs.promises.mkdir(`${dir}/${path}`);
+            } catch {}
+          } else {
             const content = await entry.async('uint8array');
+            // write file content
             await fs.promises.writeFile(`${dir}/${path}`, content);
           }
         }
       
+        // Helper to recursively list all files inside fs starting at 'dir'
+        async function listAllFiles(currentDir) {
+          const files = [];
+          async function recurse(subdir) {
+            const entries = await fs.promises.readdir(subdir);
+            for (const entry of entries) {
+              const fullPath = `${subdir}/${entry}`;
+              const stat = await fs.promises.stat(fullPath);
+              if (stat.isDirectory()) {
+                await recurse(fullPath);
+              } else {
+                files.push(fullPath.replace(`${dir}/`, ''));
+              }
+            }
+          }
+          await recurse(currentDir);
+          return files;
+        }
+      
         // Init Git repo and commit
         await git.init({ fs, dir, defaultBranch: 'main' });
-        const allFiles = await git.listFiles({ fs, dir });
-        for (const f of allFiles) {
-          await git.add({ fs, dir, filepath: f });
+        const allFiles = await listAllFiles(dir);
+        for (const filepath of allFiles) {
+          await git.add({ fs, dir, filepath });
         }
         await git.commit({
           fs,
@@ -313,47 +342,47 @@
 
         
         try {
-            const workerRes = await fetch("./worker/webcrypt.js");
-            if (!workerRes.ok) throw new Error("Failed to fetch /worker/webcrypt.js");
+          const workerRes = await fetch("./worker/webcrypt.js");
+          if (!workerRes.ok) throw new Error("Failed to fetch /worker/webcrypt.js");
 
-            const workerBlob = await workerRes.blob();
-            newZip.file("webcrypt.js", workerBlob);
-            log("Added worker webcrypt.js to the ZIP.");
+          const workerBlob = await workerRes.blob();
+          newZip.file("webcrypt.js", workerBlob);
+          log("Added worker webcrypt.js to the ZIP.");
         } catch (err) {
-            log("Error adding worker file webcrypt.js: " + err.message);
+          log("Error adding worker file webcrypt.js: " + err.message);
         }
 
         try {
-            const workerRes = await fetch("./worker/backend.js");
-            if (!workerRes.ok) throw new Error("Failed to fetch /worker/backend.js");
+          const workerRes = await fetch("./worker/backend.js");
+          if (!workerRes.ok) throw new Error("Failed to fetch /worker/backend.js");
 
-            const workerBlob = await workerRes.blob();
-            newZip.file("backend.js", workerBlob);
-            log("Added worker backend.js to the ZIP.");
+          const workerBlob = await workerRes.blob();
+          newZip.file("backend.js", workerBlob);
+          log("Added worker backend.js to the ZIP.");
         } catch (err) {
-            log("Error adding worker worker file backend.js: " + err.message);
+          log("Error adding worker worker file backend.js: " + err.message);
         }
 
         try {
-            const workerRes = await fetch("./worker/portal.html");
-            if (!workerRes.ok) throw new Error("Failed to fetch /worker/portal.html");
+          const workerRes = await fetch("./worker/portal.html");
+          if (!workerRes.ok) throw new Error("Failed to fetch /worker/portal.html");
 
-            const workerBlob = await workerRes.blob();
-            newZip.file("portal.html", workerBlob);
-            log("Added worker portal.html to the ZIP.");
+          const workerBlob = await workerRes.blob();
+          newZip.file("portal.html", workerBlob);
+          log("Added worker portal.html to the ZIP.");
         } catch (err) {
-            log("Error adding worker worker file portal.html: " + err.message);
+          log("Error adding worker worker file portal.html: " + err.message);
         }
         
         try {
-            const workerRes = await fetch("./worker/index.html");
-            if (!workerRes.ok) throw new Error("Failed to fetch /worker/index.html");
+          const workerRes = await fetch("./worker/index.html");
+          if (!workerRes.ok) throw new Error("Failed to fetch /worker/index.html");
 
-            const workerBlob = await workerRes.blob();
-            newZip.file("index.html", workerBlob);
-            log("Added worker index.html to the ZIP.");
+          const workerBlob = await workerRes.blob();
+          newZip.file("index.html", workerBlob);
+          log("Added worker index.html to the ZIP.");
         } catch (err) {
-            log("Error adding worker worker file index.html: " + err.message);
+          log("Error adding worker worker file index.html: " + err.message);
         }
 
         log("Generating .git");
