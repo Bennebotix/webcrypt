@@ -4,16 +4,21 @@ importScripts('../webcrypt.js');
 
 self.new = true;
 
-self.addEventListener("activate", (event) => {
-  event.waitUntil(clients.claim());
 
-  self.clients.matchAll().then(clients => {
-    for (const client of clients) {
-      client.postMessage({ new: self.new });
-    }
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    (async () => {
+      await clients.claim();
+
+      const clientList = await clients.matchAll({ type: "window" });
+
+      for (const client of clientList) {
+        client.postMessage({ new: self.new });
+      }
     
-    self.new = false;
-  });
+      self.new = false;
+    })()
+  );
 });
 
 self.addEventListener("install", async (event) => {
