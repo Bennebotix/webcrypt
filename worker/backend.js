@@ -23,22 +23,20 @@ self.addEventListener("install", async (event) => {
   }
 });
 
-self.addEventListener('message', event => {
-  let data = event.data;
-  
+self.addEventListener('message', async (event) => {
+  const data = event.data;
+
   if (data.pass) {
     self.pass = data.pass;
     self.key = Webcrypt.genKey(self.pass);
   } else {
-    event.waitUntil(async _ => {
-      const clientList = await clients.matchAll({ type: "window" });
-    
-      for (const client of clientList) {
-        client.postMessage({ new: self.new });
-      }
-    
-      self.new = false;
-    });
+    const clientList = await clients.matchAll({ type: "window" });
+
+    for (const client of clientList) {
+      client.postMessage({ new: self.new });
+    }
+
+    self.new = false;
   }
 });
 
