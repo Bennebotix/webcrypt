@@ -213,19 +213,13 @@
           await fs.promises.mkdir(dir);
         } catch {}
       
-        // Extract all files/folders from JSZip into fs
-        for (const [path, entry] of Object.entries(zip.files)) {
-          if (entry.dir) {
-            // create directories as needed
-            try {
-              await fs.promises.mkdir(`${dir}/${path}`);
-            } catch {}
-          } else {
-            const content = await entry.async('uint8array');
-            // write file content
-            await fs.promises.writeFile(`${dir}/${path}`, content);
-          }
+        for (const entry of Object.values(zip.files)) {
+          if (entry.dir) continue; // skip directories
+      
+          const data = await entry.async('uint8array');
+          await fs.writeFile(entry.name, data);
         }
+
       
         // Helper to recursively list all files inside fs starting at 'dir'
         async function listAllFiles(currentDir) {
