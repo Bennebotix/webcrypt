@@ -29,14 +29,14 @@ self.addEventListener('message', async (event) => {
   if (data.pass) {
     self.pass = data.pass;
     self.key = Webcrypt.genKey(self.pass);
+    
+    self.new = false;
   } else {
     const clientList = await clients.matchAll({ type: "window" });
 
     for (const client of clientList) {
       client.postMessage({ new: self.new });
     }
-
-    self.new = false;
   }
 });
 
