@@ -168,7 +168,7 @@
 
         
         try {
-            const workerRes = await fetch("/webcrypt.js");
+            const workerRes = await fetch("./webcrypt.js");
             if (!workerRes.ok) throw new Error("Failed to fetch /webcrypt.js");
 
             const workerBlob = await workerRes.blob();
@@ -179,7 +179,7 @@
         }
 
         try {
-            const workerRes = await fetch("/worker/backend.js");
+            const workerRes = await fetch("./worker/backend.js");
             if (!workerRes.ok) throw new Error("Failed to fetch /worker/backend.js");
 
             const workerBlob = await workerRes.blob();
@@ -190,7 +190,7 @@
         }
 
         try {
-            const workerRes = await fetch("/worker/index.html");
+            const workerRes = await fetch("./worker/index.html");
             if (!workerRes.ok) throw new Error("Failed to fetch /worker/index.html");
 
             const workerBlob = await workerRes.blob();
