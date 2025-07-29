@@ -136,6 +136,83 @@
         consoleBox.scrollTop = consoleBox.scrollHeight;
       };
 
+      async function zipToGitBlobUrl(zip) {
+        const files = {};
+      
+        const resolve = path => path.replace(/^\/+|\/+$/g, '');
+      
+        const fs = {
+          promises: {
+            async readFile(path) {
+              const p = resolve(path);
+              if (!(p in files)) throw new Error(`ENOENT: ${path}`);
+              return files[p];
+            },
+            async writeFile(path, data) {
+              files[resolve(path)] = data instanceof Uint8Array ? data : new TextEncoder().encode(data);
+            },
+            async mkdir(path) {},
+            async readdir(path) {
+              const prefix = resolve(path) + '/';
+              const seen = new Set();
+              for (const key in files) {
+                if (key.startsWith(prefix)) {
+                  const next = key.slice(prefix.length).split('/')[0];
+                  seen.add(next);
+                }
+              }
+              return [...seen];
+            },
+            async stat(path) {
+              const p = resolve(path);
+              if (p in files) return { isFile: () => true, isDirectory: () => false };
+              const isDir = Object.keys(files).some(k => k.startsWith(p + '/'));
+              if (isDir) return { isFile: () => false, isDirectory: () => true };
+              throw new Error(`ENOENT: ${path}`);
+            }
+          }
+        };
+      
+        const dir = 'repo';
+        const git = window.isomorphicGit;
+      
+        // 1. Write files to /repo/
+        for (const [path, entry] of Object.entries(zip.files)) {
+          if (!entry.dir) {
+            const content = await entry.async("uint8array");
+            await fs.promises.writeFile(`${dir}/${path}`, content);
+          }
+        }
+      
+        // 2. Init Git repo
+        await git.init({ fs: fs.promises, dir });
+      
+        // 3. Stage and commit
+        const allFiles = await git.listFiles({ fs: fs.promises, dir });
+        for (const f of allFiles) {
+          await git.add({ fs: fs.promises, dir, filepath: f });
+        }
+      
+        await git.commit({
+          fs: fs.promises,
+          dir,
+          message: 'Initial commit from ZIP',
+          author: { name: 'WebUser', email: 'web@example.com' }
+        });
+      
+        // 4. Create .git.zip with JSZip
+        const gitZip = new JSZip();
+        for (const [path, data] of Object.entries(files)) {
+          if (path.startsWith(`${dir}/.git/`)) {
+            gitZip.file(path.slice(`${dir}/`.length), data);
+          }
+        }
+      
+        const gitZipBlob = await gitZip.generateAsync({ type: 'blob' });
+        return URL.createObjectURL(gitZipBlob);
+      }
+
+
       document.querySelector("#file").addEventListener("change", async (e) => {
         const pass = btoa(Webcrypt.genSeed());
 
@@ -161,7 +238,7 @@
 
         const saveToZIP = async (file, path) => {
           await newZip.file(path, file, { binary: true });
-          log("Added encrypted file to new ZIP: " + path);
+          log("Added encrypted file to the ZIP: " + path);
         };
 
         for (const [relativePath, entry] of Object.entries(zipContent.files)) {
@@ -217,11 +294,12 @@
             log("Error adding worker worker file index.html: " + err.message);
         }
 
-        const content = await newZip.generateAsync({ type: "blob" });
-        const url = URL.createObjectURL(content);
+        log("Generating .git from the ZIP");
+        
+        const url = await zipToGitBlobUrl(newZip);
 
         log(
-          "Encrypted ZIP ready for download: <a href='" +
+          "Encrypted git file ready for download: <a href='" +
             url +
             "' download='" +
             webcryptFilename(file.name) +
