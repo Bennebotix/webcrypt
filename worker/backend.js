@@ -4,7 +4,13 @@ importScripts('../webcrypt.js');
 
 self.old = true;
 
+self.addEventListener("activate", (event) => {
+  event.waitUntil(clients.claim());
+});
+
 self.addEventListener("install", async (event) => {
+  self.skipWaiting();
+  
   try {
     self.old = false;
     
