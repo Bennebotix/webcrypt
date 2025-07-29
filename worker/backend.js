@@ -6,24 +6,8 @@ self.new = true;
 
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    (async () => {
-      await clients.claim();
-
-      await tellClients();
-    })()
-  );
+  event.waitUntil(clients.claim());
 });
-
-async function tellClients() {
-  const clientList = await clients.matchAll({ type: "window" });
-
-  for (const client of clientList) {
-    client.postMessage({ new: self.new });
-  }
-
-  self.new = false;
-}
 
 self.addEventListener("install", async (event) => {
   self.skipWaiting();
@@ -46,7 +30,15 @@ self.addEventListener('message', event => {
     self.pass = data.pass;
     self.key = Webcrypt.genKey(self.pass);
   } else {
-    event.waitUntil(tellClients());
+    event.waitUntil(async _ => {
+      const clientList = await clients.matchAll({ type: "window" });
+    
+      for (const client of clientList) {
+        client.postMessage({ new: self.new });
+      }
+    
+      self.new = false;
+    });
   }
 });
 
