@@ -1,18 +1,4 @@
 <script>
-  navigator.serviceWorker.addEventListener('message', e => {
-    console.log('Message from Service Worker:', e.data);
-  });
-
-  function message(msg) {
-    if (navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage(msg);
-    } else {
-      navigator.serviceWorker.ready.then(sw => {
-        sw.active.postMessage(msg);
-      });
-    }
-  }
-  
   function registerServiceWorker() {
     if ("serviceWorker" in navigator) {
       try {
