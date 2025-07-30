@@ -90,8 +90,6 @@ self.addEventListener("fetch", (event) => {
         }
       } catch (error) {
         console.log("Fetch failed: ", error);
-        const cachedResponse = await cache.match("index.html");
-        return cachedResponse;
       }
     })()
   );
