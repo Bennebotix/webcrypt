@@ -52,13 +52,13 @@ async function handle(req, cache) {
     return res;
   } else {
     console.log("fetchResponse: ", req.url);
-    console.log(url.pathname.split("/")[1] == "data");
-    console.log(url.pathname.split("/")[1], "data");
-    console.log("data");
-    console.log(url.pathname.split("/"));
-    console.log(url.pathname);
-    console.log(url);
-    console.log(atob("Y29uc29sZS5sb2codXJsLnBhdGhuYW1lLnNwbGl0KCIvIilbMV0gPT0gImRhdGEiKTsKY29uc29sZS5sb2codXJsLnBhdGhuYW1lLnNwbGl0KCIvIilbMV0sICJkYXRhIik7CmNvbnNvbGUubG9nKCJkYXRhIik7CmNvbnNvbGUubG9nKHVybC5wYXRobmFtZS5zcGxpdCgiLyIpKTsKY29uc29sZS5sb2codXJsLnBhdGhuYW1lKTsKY29uc29sZS5sb2codXJsKTs="));
+    // console.log(url.pathname.split("/")[1] == "data");
+    // console.log(url.pathname.split("/")[1]);
+    // console.log("data");
+    // console.log(url.pathname.split("/"));
+    // console.log(url.pathname);
+    // console.log(url);
+    // console.log(atob("Y29uc29sZS5sb2codXJsLnBhdGhuYW1lLnNwbGl0KCIvIilbMV0gPT0gImRhdGEiKTsKY29uc29sZS5sb2codXJsLnBhdGhuYW1lLnNwbGl0KCIvIilbMV0sICJkYXRhIik7CmNvbnNvbGUubG9nKCJkYXRhIik7CmNvbnNvbGUubG9nKHVybC5wYXRobmFtZS5zcGxpdCgiLyIpKTsKY29uc29sZS5sb2codXJsLnBhdGhuYW1lKTsKY29uc29sZS5sb2codXJsKTs="));
     return await fetch(req);
   }
 }
@@ -67,7 +67,7 @@ async function decrypt(req) {
   const oldRes = await fetch(req);
   const buffer = await oldRes.arrayBuffer();
   const enc = new Uint8Array(buffer);
-  const dec = await Webcrypt.decrypt(enc, self.key);
+  const dec = await Webcrypt.decrypt(new TextDecoder().decode(enc), self.key);
 
   return new Response(dec, {
     headers: req.headers,
