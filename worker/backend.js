@@ -41,10 +41,10 @@ self.addEventListener('message', async (event) => {
 });
 
 async function handle(req, cache) {
-  if (req.method == "GET" && req.mode == "same-origin" && pass !== "") {
+  if (req.method == "GET" && req.mode == "same-origin" && !self.new) {
     let res =  await decrypt(req);
     if (res) {
-      await cache.put(event.request, fetchResponse.clone());
+      await cache.put(event.request, res.clone());
     }
     return res;
   } else {
@@ -57,10 +57,16 @@ async function decrypt(req) {
   const buffer = await oldRes.arrayBuffer();
   const enc = new Uint8Array(buffer);
   const dec = await Webcrypt.decrypt(enc, self.key);
-  
-  // Optional: Convert decrypted bytes to string if it's UTF-8 encoded text
-  const decoder = new TextDecoder();
-  const text = decoder.decode(decrypted);
+
+  return new Response(dec, {
+    headers: req.headers,
+    ok: req.ok,
+    redirected: req.redirected,
+    status: req.status,
+    statusText: req.statusText,
+    type: req.type,
+    url: req.url
+  });
 }
 
 // Fetching resources
