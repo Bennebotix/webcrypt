@@ -232,7 +232,6 @@
           await fs.writeFile(entry.name, data);
         }
 
-      
         // Helper to recursively list all files inside fs starting at 'dir'
         async function listAllFiles(currentDir) {
           const files = [];
@@ -251,6 +250,8 @@
           await recurse(currentDir);
           return files;
         }
+
+        console.log(await listAllFiles(dir));
       
         // Init Git repo and commit
         await git.init({ fs, dir, defaultBranch: 'main' });
