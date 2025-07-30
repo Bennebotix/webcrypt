@@ -50,7 +50,8 @@ async function handle(req, cache) {
     return res;
   } else {
     console.log("fetchResponse: ", req.url);
-    console.log(req.method == "GET", req.mode == "same-origin", new URL(req.url).pathname.split("/")[1] == "data", !self.new);
+    console.log(req.url);
+    console.log(new URL(req.url));
     return await fetch(req);
   }
 }
