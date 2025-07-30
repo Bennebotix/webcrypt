@@ -402,7 +402,7 @@
 
         log("Generating .git");
 
-        await publishToGitHub(newZip);
+        // await publishToGitHub(newZip);
         
         const url = URL.createObjectURL(await zip.generateAsync({ type: "blob" }));
 
