@@ -42,13 +42,14 @@ self.addEventListener('message', async (event) => {
 
 async function handle(req, cache) {
   if (req.method == "GET" && req.mode == "same-origin" && new URL(req.url).pathname.split("/")[1] == "data" && !self.new) {
-    console.log("decryptResponse: ", event.request.url);
+    console.log("decryptResponse: ", req.url);
     let res =  await decrypt(req);
     if (res) {
       await cache.put(event.request, res.clone());
     }
     return res;
   } else {
+    console.log("fetchResponse: ", req.url);
     return await fetch(req);
   }
 }
@@ -85,7 +86,6 @@ self.addEventListener("fetch", (event) => {
 
         const fetchResponse = await handle(event.request, cache);
         if (fetchResponse) {
-          console.log("fetchResponse: ", event.request.url);
           return fetchResponse;
         }
       } catch (error) {
