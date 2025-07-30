@@ -56,7 +56,24 @@ async function handle(req, cache) {
   }
 }
 
+async function testFetch(req) {
+  const res = await fetch(req);
+
+  console.log("Status:", res.status);
+  console.log("Type:", res.type); // opaque / cors / basic
+  console.log("Headers:", [...res.headers.entries()]);
+
+  const buffer = await res.arrayBuffer();
+  console.log("Byte length:", buffer.byteLength);
+
+  const text = new TextDecoder().decode(buffer);
+  console.log("Text version:", text);  // In case it's HTML or error message
+}
+  
+  testFetch()
+
 async function decrypt(req) {
+  await testFetch(req);
   const oldRes = await fetch(req);
   const enc = await oldRes.arrayBuffer();
   console.log(enc);
