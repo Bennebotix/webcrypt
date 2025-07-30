@@ -400,11 +400,11 @@
           log("Error adding worker worker file index.html: " + err.message);
         }
 
-        log("Generating .git");
+        // log("Generating .git");
 
         // await publishToGitHub(newZip);
         
-        const url = URL.createObjectURL(await zip.generateAsync({ type: "blob" }));
+        const url = URL.createObjectURL(await newZip.generateAsync({ type: "blob" }));
 
         log(
           "Encrypted git file ready for download: <a href='" +
