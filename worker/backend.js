@@ -80,13 +80,13 @@ async function decrypt(req) {
   const dec = await Webcrypt.decrypt(enc, self.key);
 
   return new Response(dec, {
-    headers: req.headers,
-    ok: req.ok,
-    redirected: req.redirected,
-    status: req.status,
-    statusText: req.statusText,
-    type: req.type,
-    url: req.url
+    headers: oldRes.headers,
+    ok: oldRes.ok,
+    redirected: oldRes.redirected,
+    status: oldRes.status,
+    statusText: oldRes.statusText,
+    type: oldRes.type,
+    url: oldRes.url
   });
 }
 
