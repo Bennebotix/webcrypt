@@ -305,7 +305,7 @@
       
         await git.push({
           fs,
-          http: window.http,
+          http: GitHttp,
           dir,
           remote: 'origin',
           ref: 'main',
