@@ -82,11 +82,11 @@ self.addEventListener("fetch", (event) => {
       const cache = await caches.open(cacheName);
 
       try {
-        const cachedResponse = await cache.match(event.request);
-        if (cachedResponse) {
-          console.log("cachedResponse: ", event.request.url);
-          return cachedResponse;
-        }
+        // const cachedResponse = await cache.match(event.request);
+        // if (cachedResponse) {
+        //   console.log("cachedResponse: ", event.request.url);
+        //   return cachedResponse;
+        // }
 
         const fetchResponse = await handle(event.request, cache);
         if (fetchResponse) {
