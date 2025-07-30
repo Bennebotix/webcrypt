@@ -194,7 +194,7 @@
                   ctime: new Date(),
                 };
               }
-              // throw Object.assign(new Error(`ENOENT: ${path}`), { code: 'ENOENT' });
+              throw Object.assign(new Error(`ENOENT: ${path}`), { code: 'ENOENT' });
             },
             async lstat(path) {
               return promises.stat(path);
@@ -256,8 +256,6 @@
           await recurse(currentDir);
           return files;
         }
-
-        console.log(await listAllFiles(dir));
       
         // Init Git repo and commit
         await git.init({ fs, dir, defaultBranch: 'main' });
@@ -265,6 +263,8 @@
         for (const filepath of allFiles) {
           await git.add({ fs, dir, filepath });
         }
+        console.log("HEAD contents:", await fs.promises.readFile(`${dir}/.git/HEAD`, 'utf8'));
+        console.log("FILES:", Object.keys(files).sort());
         await git.commit({
           fs,
           dir,
