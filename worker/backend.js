@@ -73,9 +73,9 @@ async function testFetch(req) {
   testFetch()
 
 async function decrypt(req) {
-  await testFetch(req);
+  // await testFetch(req);
   const oldRes = await fetch(req, { redirect: "follow" });
-  const enc = await oldRes.arrayBuffer();
+  const enc = await oldRes.text();
   console.log(enc);
   const dec = await Webcrypt.decrypt(enc, self.key);
 
