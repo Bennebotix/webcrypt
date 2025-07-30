@@ -229,7 +229,7 @@
           if (entry.dir) continue; // skip directories
       
           const data = await entry.async('uint8array');
-          await fs.writeFile(entry.name, data);
+          await fs.writeFile(`${dir}/${entry.name}`, data);
         }
 
         // Helper to recursively list all files inside fs starting at 'dir'
