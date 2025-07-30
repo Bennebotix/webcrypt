@@ -33,7 +33,7 @@
   navigator.serviceWorker.addEventListener("message", e => {
     console.log("Message from service worker:", e);
     const p = window.location.pathname;
-    const loc = e.data.new ? "portal" : "data/";
+    const loc = e.data.new ? "portal" : "data";
     if (p.endsWith("/")) {
       window.location.pathname = p + loc;
     } else if (p.includes(".", p.lastIndexOf("/"))) {
