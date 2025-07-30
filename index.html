@@ -177,7 +177,10 @@
                 return {
                   isFile: () => true,
                   isDirectory: () => false,
-                  isSymbolicLink: () => false
+                  isSymbolicLink: () => false,
+                  size: 1234,
+                  mtime: new Date(),
+                  ctime: new Date(),
                 };
               }
               const isDir = Object.keys(files).some(k => k.startsWith(p + '/'));
@@ -185,7 +188,10 @@
                 return {
                   isFile: () => false,
                   isDirectory: () => true,
-                  isSymbolicLink: () => false
+                  isSymbolicLink: () => false,
+                  size: 1234,
+                  mtime: new Date(),
+                  ctime: new Date(),
                 };
               }
               // throw Object.assign(new Error(`ENOENT: ${path}`), { code: 'ENOENT' });
