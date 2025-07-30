@@ -59,7 +59,6 @@ async function handle(req, cache) {
 async function decrypt(req) {
   const oldRes = await fetch(req, { redirect: "follow" });
   const enc = await oldRes.text();
-  console.log(self.pass, self.key);
   const dec = await Webcrypt.decrypt(enc, self.key);
 
   return new Response(dec, {
