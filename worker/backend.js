@@ -41,7 +41,7 @@ self.addEventListener('message', async (event) => {
 });
 
 async function handle(req, cache) {
-  if (req.method == "GET" && req.mode == "same-origin" && isInDataDir(req.url) && !self.new) {
+  if (req.method == "GET" && req.mode == "same-origin" && new URL(req.url).pathname.split("/")[1] == "data" && !self.new) {
     console.log("decryptResponse: ", event.request.url);
     let res =  await decrypt(req);
     if (res) {
@@ -68,11 +68,6 @@ async function decrypt(req) {
     type: req.type,
     url: req.url
   });
-}
-
-function isInDataDir(url) {
-  const path = new URL(url).pathname;
-  return /^\/(?:[^\/]+\/)*data(?:\/.*)?(?:\.[^\/]*)?$/.test(path) || /^\/(?:[^\/]+\/)*data\/?$/.test(path);
 }
 
 // Fetching resources
