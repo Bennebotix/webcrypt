@@ -14,7 +14,7 @@ self.addEventListener("install", async (event) => {
   
   try {
     self.pass = "";
-    self.key = Webcrypt.genRandKey();
+    self.key = await Webcrypt.genRandKey();
     
     const cache = await caches.open(cacheName);
     await cache.addAll(assets);
@@ -28,7 +28,7 @@ self.addEventListener('message', async (event) => {
 
   if (data.pass) {
     self.pass = data.pass;
-    self.key = Webcrypt.genKey(self.pass);
+    self.key = await Webcrypt.genKey(self.pass);
     
     self.new = false;
   } else {
