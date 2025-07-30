@@ -42,6 +42,7 @@ self.addEventListener('message', async (event) => {
 
 async function handle(req, cache) {
   if (req.method == "GET" && req.mode == "same-origin" && isInDataDir(req.url) && !self.new) {
+    console.log("decryptResponse: ", event.request.url);
     let res =  await decrypt(req);
     if (res) {
       await cache.put(event.request, res.clone());
