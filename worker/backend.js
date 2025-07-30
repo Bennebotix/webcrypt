@@ -65,9 +65,9 @@ async function handle(req, cache) {
 
 async function decrypt(req) {
   const oldRes = await fetch(req);
-  const buffer = await oldRes.arrayBuffer();
-  const enc = new Uint8Array(buffer);
-  const dec = await Webcrypt.decrypt(new TextDecoder().decode(enc), self.key);
+  const enc = await oldRes.text();
+  console.log(enc);
+  const dec = await Webcrypt.decrypt(enc, self.key);
 
   return new Response(dec, {
     headers: req.headers,
