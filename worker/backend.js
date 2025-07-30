@@ -47,7 +47,7 @@ async function handle(req, cache) {
     console.log("decryptResponse: ", req.url);
     let res =  await decrypt(req);
     if (res) {
-      await cache.put(event.request, res.clone());
+      await cache.put(req, res.clone());
     }
     return res;
   } else {
