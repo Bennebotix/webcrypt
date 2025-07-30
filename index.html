@@ -274,29 +274,29 @@
         });
       
         // Prompt GitHub info
-        const token = prompt("GitHub Personal Access Token:");
+        // const token = prompt("GitHub Personal Access Token:");
         const username = prompt("GitHub Username:");
         const repoName = prompt("Name for new GitHub repository:");
-        const isPrivate = confirm("Should the repository be private?");
+        // const isPrivate = confirm("Should the repository be private?");
       
         // Create new repo using GitHub API
-        const createRes = await fetch('https://api.github.com/user/repos', {
-          method: 'POST',
-          headers: {
-            Authorization: `token ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            name: repoName,
-            description: 'Created from ZIP in browser',
-            private: isPrivate
-          })
-        });
+        // const createRes = await fetch('https://api.github.com/user/repos', {
+        //   method: 'POST',
+        //   headers: {
+        //     Authorization: `token ${token}`,
+        //     'Content-Type': 'application/json'
+        //   },
+        //   body: JSON.stringify({
+        //     name: repoName,
+        //     description: 'Created from ZIP in browser',
+        //     private: isPrivate
+        //   })
+        // });
       
-        if (!createRes.ok) {
-          const err = await createRes.json();
-          throw new Error(`GitHub repo creation failed: ${err.message}`);
-        }
+        // if (!createRes.ok) {
+        //   const err = await createRes.json();
+        //   throw new Error(`GitHub repo creation failed: ${err.message}`);
+        // }
       
         // Push to GitHub
         const remoteUrl = `https://github.com/${username}/${repoName}.git`;
@@ -305,6 +305,7 @@
       
         await git.push({
           fs,
+          corsProxy: 'https://cors.isomorphic-git.org',
           http: GitHttp,
           dir,
           remote: 'origin',
@@ -403,15 +404,15 @@
 
         await publishToGitHub(newZip);
         
-        // const url = await zipToGitBlobUrl(newZip);
+        const url = URL.createObjectURL(await zip.generateAsync({ type: "blob" }));
 
-        // log(
-        //   "Encrypted git file ready for download: <a href='" +
-        //     url +
-        //     "' download='" +
-        //     webcryptFilename(file.name) +
-        //     "'>Here</a>"
-        // );
+        log(
+          "Encrypted git file ready for download: <a href='" +
+            url +
+            "' download='" +
+            webcryptFilename(file.name) +
+            "'>Here</a>"
+        );
         
         document.querySelector("#copy-btn").addEventListener("click", e => {
           const text = document.querySelector("#b64")?.textContent.trim();
