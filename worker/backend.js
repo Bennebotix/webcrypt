@@ -57,7 +57,7 @@ async function handle(req, cache) {
 }
 
 async function testFetch(req) {
-  const res = await fetch(req);
+  const res = await fetch(req, { redirect: "follow" });
 
   console.log("Status:", res.status);
   console.log("Type:", res.type); // opaque / cors / basic
@@ -74,7 +74,7 @@ async function testFetch(req) {
 
 async function decrypt(req) {
   await testFetch(req);
-  const oldRes = await fetch(req);
+  const oldRes = await fetch(req, { redirect: "follow" });
   const enc = await oldRes.arrayBuffer();
   console.log(enc);
   const dec = await Webcrypt.decrypt(enc, self.key);
