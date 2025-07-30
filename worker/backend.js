@@ -41,7 +41,9 @@ self.addEventListener('message', async (event) => {
 });
 
 async function handle(req, cache) {
-  if (req.method == "GET" && req.mode == "same-origin" && new URL(req.url).pathname.split("/")[1] == "data" && !self.new) {
+  const url = new URL(req.url);
+  
+  if (req.method == "GET" && url.origin == location.origin && url.pathname.split("/")[1] == "data" && !self.new) {
     console.log("decryptResponse: ", req.url);
     let res =  await decrypt(req);
     if (res) {
@@ -50,8 +52,13 @@ async function handle(req, cache) {
     return res;
   } else {
     console.log("fetchResponse: ", req.url);
-    console.log(new URL(req.url).pathname.split("/")[1] == "data");
-    console.log(new URL(req.url).origin == location.origin);
+    console.log(url.pathname.split("/")[1] == "data");
+    console.log(url.pathname.split("/")[1], "data");
+    console.log("data");
+    console.log(url.pathname.split("/"));
+    console.log(url.pathname);
+    console.log(url);
+    console.log(atob("Y29uc29sZS5sb2codXJsLnBhdGhuYW1lLnNwbGl0KCIvIilbMV0gPT0gImRhdGEiKTsKY29uc29sZS5sb2codXJsLnBhdGhuYW1lLnNwbGl0KCIvIilbMV0sICJkYXRhIik7CmNvbnNvbGUubG9nKCJkYXRhIik7CmNvbnNvbGUubG9nKHVybC5wYXRobmFtZS5zcGxpdCgiLyIpKTsKY29uc29sZS5sb2codXJsLnBhdGhuYW1lKTsKY29uc29sZS5sb2codXJsKTs="));
     return await fetch(req);
   }
 }
