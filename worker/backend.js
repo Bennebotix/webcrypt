@@ -34,7 +34,6 @@ async function handle(req, cache) {
   const url = new URL(req.url);
   
   if (req.method == "GET" && url.origin == location.origin && !self.new) {
-    console.log("decryptResponse: ", req.url);
     let res =  await decrypt(req);
     if (res) {
       await cache.put(req, res.clone());
