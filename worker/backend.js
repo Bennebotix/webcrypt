@@ -11,6 +11,7 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("install", async (event) => {
   self.skipWaiting();
+  cache
   
   try {
     self.pass = "";
@@ -32,18 +33,18 @@ self.addEventListener('message', async (event) => {
     
     self.new = false;
   } else {
-    const clientList = await clients.matchAll({ type: "window" });
+    // const clientList = await clients.matchAll({ type: "window" });
 
-    for (const client of clientList) {
-      client.postMessage({ new: self.new });
-    }
+    // for (const client of clientList) {
+    //   client.postMessage({ new: self.new });
+    // }
   }
 });
 
 async function handle(req, cache) {
   const url = new URL(req.url);
   
-  if (req.method == "GET" && url.origin == location.origin && url.pathname.split("/")[1] == "data" && !self.new) {
+  if (req.method == "GET" && url.origin == location.origin && !self.new) {
     console.log("decryptResponse: ", req.url);
     let res =  await decrypt(req);
     if (res) {
@@ -57,7 +58,11 @@ async function handle(req, cache) {
 }
 
 async function decrypt(req) {
-  const oldRes = await fetch(req, { redirect: "follow" });
+  let newReq = req.clone();
+  newReq.url = new URL(newReq.url);
+  newReq.url.pathname = "/data" + newReq.url.pathname;
+  newReq.url = newReq.url.href;
+  const oldRes = await fetch(newReq, { redirect: "follow" });
   const enc = await oldRes.text();
   const dec = (new TextDecoder).decode(await Webcrypt.decrypt(enc, self.key));
 
@@ -72,18 +77,17 @@ async function decrypt(req) {
   });
 }
 
-// Fetching resources
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     (async () => {
       const cache = await caches.open(cacheName);
 
       try {
-        // const cachedResponse = await cache.match(event.request);
-        // if (cachedResponse) {
-        //   console.log("cachedResponse: ", event.request.url);
-        //   return cachedResponse;
-        // }
+        const cachedResponse = await cache.match(event.request);
+        if (cachedResponse) {
+          console.log("cachedResponse: ", event.request.url);
+          return cachedResponse;
+        }
 
         const fetchResponse = await handle(event.request, cache);
         if (fetchResponse) {
