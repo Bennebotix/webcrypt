@@ -189,8 +189,7 @@
 
       message({ pass: passwordInput.value });
 
-      const p = location.pathname, i = p.lastIndexOf("portal");
-      if(i > -1) location.pathname = p.slice(0,i);
+      window.reload();
     });
 
     passwordInput.addEventListener('keydown', (e) => {
