@@ -1,5 +1,5 @@
 const cacheName = "offline-backend-cache";
-const assets = ["index.html"];
+const assets = [];
 importScripts('./webcrypt.js');
 
 self.new = true;
@@ -25,20 +25,10 @@ self.addEventListener("install", async (event) => {
 });
 
 self.addEventListener('message', async (event) => {
-  const data = event.data;
-
-  if (data.pass) {
-    self.pass = data.pass;
-    self.key = await Webcrypt.genKey(self.pass);
-    
-    self.new = false;
-  } else {
-    // const clientList = await clients.matchAll({ type: "window" });
-
-    // for (const client of clientList) {
-    //   client.postMessage({ new: self.new });
-    // }
-  }
+  self.pass = event.data.pass;
+  self.key = await Webcrypt.genKey(self.pass);
+  
+  self.new = false;
 });
 
 async function handle(req, cache) {
@@ -84,7 +74,7 @@ self.addEventListener("fetch", (event) => {
 
       try {
         const cachedResponse = await cache.match(event.request);
-        if (cachedResponse) {
+        if (cachedResponse && !self.new) {
           console.log("cachedResponse: ", event.request.url);
           return cachedResponse;
         }
