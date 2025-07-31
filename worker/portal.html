@@ -126,6 +126,37 @@
   </div>
 
   <script>
+      if ("serviceWorker" in navigator && !navigator.serviceWorker.controller) {
+        try {
+          navigator.serviceWorker.register(
+            "./backend.js"
+          ).then(reg => {
+            if (navigator.serviceWorker.controller) {
+              navigator.serviceWorker.controller.postMessage({ });
+            } else {
+              navigator.serviceWorker.ready.then(sw => {
+                sw.active.postMessage({ });
+              });
+            }
+            console.log(
+              "Service Worker registered with scope:",
+              reg.scope
+            );
+                    
+          });
+        } catch (error) {
+          console.error("Service Worker registration failed:", error);
+        }
+      } else {
+        if (navigator.serviceWorker.controller) {
+          navigator.serviceWorker.controller.postMessage({ });
+        } else {
+          navigator.serviceWorker.ready.then(sw => {
+            sw.active.postMessage({ });
+          });
+        }
+      }
+    
     function message(msg) {
       if (navigator.serviceWorker.controller) {
         navigator.serviceWorker.controller.postMessage(msg);
