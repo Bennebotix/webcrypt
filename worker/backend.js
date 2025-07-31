@@ -11,7 +11,6 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("install", async (event) => {
   self.skipWaiting();
-  cache
   
   try {
     self.pass = "";
