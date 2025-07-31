@@ -47,11 +47,9 @@ async function handle(req, cache) {
 }
 
 async function decrypt(req) {
-  let newReq = req.clone();
-  newReq.url = new URL(newReq.url);
-  newReq.url.pathname = "/data" + newReq.url.pathname;
-  newReq.url = newReq.url.href;
-  const oldRes = await fetch(newReq, { redirect: "follow" });
+  let url = new URL(req.url);
+  url.pathname = "/data" + url.pathname;
+  const oldRes = await fetch(url.href, { redirect: "follow" });
   const enc = await oldRes.text();
   const dec = (new TextDecoder).decode(await Webcrypt.decrypt(enc, self.key));
 
