@@ -396,7 +396,7 @@
         const url = URL.createObjectURL(await newZip.generateAsync({ type: "blob" }));
 
         log(
-          "Encrypted git file ready for download: <a href='" +
+          "Encrypted ZIP ready for download: <a href='" +
             url +
             "' download='" +
             webcryptFilename(file.name) +
