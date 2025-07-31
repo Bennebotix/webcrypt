@@ -1,4 +1,5 @@
 <script>
+  const p = location.pathname;
   if (p.endsWith("/")) {
     window.location.pathname = p + "portal";
   } else if (p.includes(".", p.lastIndexOf("/"))) {
