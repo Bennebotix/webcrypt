@@ -52,10 +52,19 @@ async function decrypt(req) {
   console.log("decryptResponse: ", url.href);
   
   const oldRes = await fetch(url.href, { redirect: "follow" });
-  const enc = await oldRes.text();
-  const dec = (new TextDecoder).decode(await Webcrypt.decrypt(enc, self.key));
+  const contentType = oldRes.headers.get("Content-Type") || "";
 
-  return new Response(dec, {
+  const enc = await oldRes.text();
+  const decArrayBuffer = await Webcrypt.decrypt(enc, self.key);
+
+  let body;
+  if (contentType.startsWith("text/")) {
+    body = new TextDecoder().decode(decArrayBuffer);
+  } else {
+    body = decArrayBuffer;
+  }
+
+  return new Response(body, {
     headers: oldRes.headers,
     ok: oldRes.ok,
     redirected: oldRes.redirected,
