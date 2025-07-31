@@ -379,6 +379,17 @@
         }
         
         try {
+          const workerRes = await fetch("./worker/404.html");
+          if (!workerRes.ok) throw new Error("Failed to fetch /worker/404.html");
+
+          const workerBlob = await workerRes.blob();
+          newZip.file("404.html", workerBlob);
+          log("Added worker 404.html to the ZIP.");
+        } catch (err) {
+          log("Error adding worker worker file 404.html: " + err.message);
+        }
+        
+        try {
           const workerRes = await fetch("./worker/index.html");
           if (!workerRes.ok) throw new Error("Failed to fetch /worker/index.html");
 
