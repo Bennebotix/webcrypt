@@ -377,17 +377,6 @@
         } catch (err) {
           log("Error adding worker worker file backend.js: " + err.message);
         }
-
-        try {
-          const workerRes = await fetch("./worker/portal.html");
-          if (!workerRes.ok) throw new Error("Failed to fetch /worker/portal.html");
-
-          const workerBlob = await workerRes.blob();
-          newZip.file("portal.html", workerBlob);
-          log("Added worker portal.html to the ZIP.");
-        } catch (err) {
-          log("Error adding worker worker file portal.html: " + err.message);
-        }
         
         try {
           const workerRes = await fetch("./worker/index.html");
