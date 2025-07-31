@@ -49,6 +49,9 @@ async function handle(req, cache) {
 async function decrypt(req) {
   let url = new URL(req.url);
   url.pathname = "/data" + url.pathname;
+  
+  console.log("decryptResponse: ", url.href);
+  
   const oldRes = await fetch(url.href, { redirect: "follow" });
   const enc = await oldRes.text();
   const dec = (new TextDecoder).decode(await Webcrypt.decrypt(enc, self.key));
@@ -70,11 +73,11 @@ self.addEventListener("fetch", (event) => {
       const cache = await caches.open(cacheName);
 
       try {
-        const cachedResponse = await cache.match(event.request);
-        if (cachedResponse && !self.new) {
-          console.log("cachedResponse: ", event.request.url);
-          return cachedResponse;
-        }
+        // const cachedResponse = await cache.match(event.request);
+        // if (cachedResponse && !self.new) {
+        //   console.log("cachedResponse: ", event.request.url);
+        //   return cachedResponse;
+        // }
 
         const fetchResponse = await handle(event.request, cache);
         if (fetchResponse) {
